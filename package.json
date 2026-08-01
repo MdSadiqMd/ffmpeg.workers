@@ -1,21 +1,44 @@
 {
 	"name": "ffmpeg-workers",
-	"version": "0.0.0",
+	"version": "1.0.0",
 	"private": true,
+	"type": "module",
 	"scripts": {
-		"deploy": "wrangler deploy",
+		"build:testwasm": "bash scripts/build-test-wasm.sh",
+		"build:shim": "esbuild src/wasi.ts --format=esm --platform=node --outfile=dist/wasi.mjs",
+		"test:node": "pnpm build:shim && node test/run-node.mjs",
 		"dev": "wrangler dev",
-		"start": "wrangler dev",
-		"test": "vitest",
+		"typecheck": "tsc --noEmit",
+		"deploy": "bash scripts/deploy.sh",
+		"build:ffmpeg": "bash scripts/build-ffmpeg.sh full",
+		"test:e2e": "bash test/e2e.sh",
+		"build:x264": "bash scripts/build-x264.sh",
+		"build:ffmpeg:min": "bash scripts/build-ffmpeg.sh min",
+		"build:all": "bash scripts/build-x264.sh && bash scripts/build-ffmpeg.sh full && bash scripts/build-ffmpeg.sh min",
+		"test:paid": "bash scripts/test-paid.sh",
+		"test:features": "cp build/app.min.wasm build/app.wasm && wrangler deploy --dry-run --outdir dist-bundle -c wrangler.toml && node test/job-features.mjs",
+		"test:matrix": "bash scripts/test-matrix.sh",
+		"test": "vitest run",
+		"test:watch": "vitest",
 		"cf-typegen": "wrangler types",
 		"format": "pnpx @biomejs/biome format --write ."
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.5.5",
 		"@cloudflare/vitest-pool-workers": "^0.12.4",
+		"@cloudflare/workers-types": "^5.20260722.1",
 		"@types/node": "^26.1.1",
+		"esbuild": "^0.28.1",
+		"miniflare": "^4.0.0",
 		"typescript": "^5.5.2",
 		"vitest": "~3.2.0",
 		"wrangler": "^4.113.0"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"esbuild",
+			"workerd",
+			"sharp"
+		]
 	}
 }

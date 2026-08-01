@@ -11,7 +11,11 @@
 		"enabled": true
 	},
 	"upload_source_maps": true,
-	"compatibility_flags": ["nodejs_compat"]
+	"compatibility_flags": ["nodejs_compat"],
+	// Only the module graph reachable from `main` is uploaded (src/*.ts + the one
+	// imported build/app.wasm). Directory scanning is off so tests, fixtures,
+	// scripts, docs and the other .wasm builds are never bundled/deployed
+	"find_additional_modules": false
 	/**
 	 * Smart Placement
 	 * https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
