@@ -1,0 +1,14 @@
+name = "ffmpeg-workers"
+main = "src/index.ts"
+compatibility_date = "2026-07-23"
+compatibility_flags = ["nodejs_compat"]
+
+# Only the module graph reachable from `main` is uploaded - tests, fixtures,
+# scripts, docs and the other .wasm builds are never bundled
+find_additional_modules = false
+
+[observability]
+enabled = true
+
+[limits]
+cpu_ms = 300000

@@ -1,0 +1,12 @@
+name = "ffmpeg-workers"
+main = "src/index.ts"
+compatibility_date = "2026-07-23"
+compatibility_flags = ["nodejs_compat"]
+
+# Only the module graph reachable from `main` is uploaded (src/*.ts + the single
+# imported build/app.wasm). Disabling directory scanning guarantees nothing else
+# tests, fixtures, scripts, docs, the other .wasm builds is ever bundled
+find_additional_modules = false
+
+[observability]
+enabled = true
