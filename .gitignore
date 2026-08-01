@@ -165,3 +165,8 @@ dist
 .env*
 !.env.example
 .wrangler/
+
+# Build artifacts
+build/*.wasm
+dist-bundle/
+test/fixtures/
