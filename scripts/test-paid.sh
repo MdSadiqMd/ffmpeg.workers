@@ -9,6 +9,15 @@ cd "$ROOT"
 [ -f build/app.full.wasm ] || { echo "run: pnpm build:ffmpeg (full) first"; exit 1; }
 cp build/app.full.wasm build/app.wasm
 
+F=test/fixtures
+if [ ! -f "$F/input.mp4" ]; then
+  echo "missing $F/input.mp4"
+  echo "run: pnpm test:matrix (downloads it) or run:"
+  echo "  curl -sL -o $F/input.mp4 https://samplelib.com/lib/preview/mp4/sample-10s.mp4"
+  exit 1
+fi
+bash scripts/gen-fixtures.sh
+
 echo "==> Bundling full build (paid config)"
 rm -rf dist-bundle
 npx wrangler deploy --dry-run --outdir dist-bundle -c wrangler.paid.toml >/dev/null 2>&1

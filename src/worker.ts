@@ -429,7 +429,7 @@ async function jobFromMultipart(req: Request): Promise<Job> {
 	return job;
 }
 
-const HELP = `ffmpeg-on-workers — FFmpeg inside a single Cloudflare Worker isolate.
+const HELP = `FFmpeg inside a single Cloudflare Worker isolate
 
 SIMPLE (raw body):
   POST /  body = media bytes

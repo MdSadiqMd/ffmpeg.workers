@@ -3,7 +3,7 @@
 # for Cloudflare Workers (no threads / no SharedArrayBuffer there)
 #
 # Pinned to ffmpeg 4.4: its CLI does NOT depend on `threads` and has no threaded
-# scheduler, so it runs correctly single-threaded. FFmpeg >= 5.1 rewrote the CLI
+# scheduler, so it runs correctly single-threaded. FFmpeg >= 6.1 rewrote the CLI
 # around a mandatory thread scheduler and cannot run without threads
 #
 # MODE (arg 1 or $MODE):

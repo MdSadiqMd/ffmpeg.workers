@@ -1,13 +1,15 @@
 // Fast logic check for the WASI shim, run in plain Node against real fs.
 // This validates the syscall implementations (args, path_open, read, write,
 // seek, stderr, proc_exit) before running inside workerd. It uses a real temp
-// dir; on Workers the identical code runs against the in-memory /tmp VFS
+// dir; on Workers the identical code runs against the in-memory /tmp VFS.
+// Uses the checked-in test/prog.wasm (see scripts/build-test-wasm.sh), so no
+// wasi-sdk toolchain and no particular build/app.wasm are required
 import { readFileSync, writeFileSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { WASI } from "../dist/wasi.mjs";
 
-const wasmBytes = readFileSync(new URL("../build/app.wasm", import.meta.url));
+const wasmBytes = readFileSync(new URL("../test/prog.wasm", import.meta.url));
 const module = await WebAssembly.compile(wasmBytes);
 
 const dir = mkdtempSync(join(tmpdir(), "wasi-test-"));

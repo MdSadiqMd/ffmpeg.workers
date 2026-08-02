@@ -6,12 +6,18 @@
 // running on an unlimited/Paid plan. This lets us exercise Paid-only
 // capabilities (H.264 encode via libx264, HEVC/VP9 decode) without deploying.
 //
-// Prereqs:
+// Prereqs (handled by scripts/test-paid.sh):
+//   test/fixtures/input.mp4 (+ hevc.mp4, vp9.webm via scripts/gen-fixtures.sh)
 //   cp build/app.full.wasm build/app.wasm
 //   npx wrangler deploy --dry-run --outdir dist-bundle -c wrangler.paid.toml
 import { Miniflare } from "miniflare";
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { execFileSync } from "node:child_process";
+
+const FIX = new URL("../test/fixtures/", import.meta.url).pathname;
+const OUT = mkdtempSync(join(tmpdir(), "mfpaid-"));
 
 const mf = new Miniflare({
 	modules: true,
@@ -52,7 +58,7 @@ async function run(name, inFile, outExt, args, expect) {
 		body,
 	});
 	const buf = Buffer.from(await res.arrayBuffer());
-	const out = `/tmp/mf.${outExt}`;
+	const out = join(OUT, `out.${outExt}`);
 	writeFileSync(out, buf);
 	const ok = res.status === 200 && buf.length > 0;
 	const info = ok
@@ -74,7 +80,7 @@ console.log("=== Miniflare: FULL build (Paid-plan emulation) ===");
 // Paid-only capabilities:
 await t(
 	"H.264 ENCODE (libx264)",
-	"/tmp/sample.mp4",
+	FIX + "input.mp4",
 	"mp4",
 	[
 		"-vf",
@@ -92,14 +98,14 @@ await t(
 );
 await t(
 	"HEVC decode -> mpeg4",
-	"/tmp/hevc.mp4",
+	FIX + "hevc.mp4",
 	"mp4",
 	["-c:v", "mpeg4", "-q:v", "5", "-an"],
 	"mpeg4",
 );
 await t(
 	"VP9 decode -> h264",
-	"/tmp/vp9.webm",
+	FIX + "vp9.webm",
 	"mp4",
 	["-c:v", "libx264", "-preset", "ultrafast", "-an"],
 	"h264",
@@ -107,21 +113,21 @@ await t(
 // General ops:
 await t(
 	"transcode mpeg4",
-	"/tmp/sample.mp4",
+	FIX + "input.mp4",
 	"mp4",
 	["-vf", "scale=160:-2", "-c:v", "mpeg4", "-q:v", "5", "-an"],
 	"mpeg4",
 );
 await t(
 	"thumbnail png",
-	"/tmp/sample.mp4",
+	FIX + "input.mp4",
 	"png",
 	["-frames:v", "1", "-c:v", "png"],
 	null,
 );
 await t(
 	"gif",
-	"/tmp/sample.mp4",
+	FIX + "input.mp4",
 	"gif",
 	["-vf", "scale=120:-2,fps=8", "-t", "1"],
 	"gif",
